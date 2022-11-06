@@ -20,7 +20,9 @@
  * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
  */
 
-// curl -L 'http://localhost/wordpress/wp-json/formidable-auto-backup/v1/run?uname=admin&pwd=admin' -o formidable-backup`date +'-%Y-%m-%d@%H:%M:%S'`.xml
+/*
+curl -L 'http://rbundle.com/wp-json/formidable-auto-backup/v1/run?uname=russell.guilfoile@rbundle.com&pwd=t$pv(*ARzV0e@ZKBfrmJShcX' -o /home/u852799524/domains/rbundle.com/public_html/wp-content/plugins/formidable-auto-backup/formidable-backup`date +'-%Y-%m-%d@%H:%M:%S'`.xml
+*/
 add_action('rest_api_init', function () {
     register_rest_route('formidable-auto-backup/v1', '/run', array(
         'methods' => 'GET',
