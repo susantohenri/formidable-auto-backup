@@ -29,7 +29,7 @@ add_action('rest_api_init', function () {
             $uname = $_GET['uname'];
             $pwd = $_GET['pwd'];
             $login_url = str_replace('https', 'http', site_url('wp-login.php'));
-            $cookie_file = plugin_dir_path( __FILE__ ) . 'formidable-auto-backup.cookie';
+            $cookie_file = plugin_dir_path(__FILE__) . 'formidable-auto-backup.cookie';
             $export_url = str_replace('https', 'http', site_url('wp-admin/admin-ajax.php'));
             $form_url = str_replace('https', 'http', site_url('wp-admin/admin.php?page=formidable-import'));
 
@@ -103,11 +103,20 @@ add_action('rest_api_init', function () {
             $nonce = explode('"', $nonce[1]);
             $nonce = $nonce[0];
 
+            global $wpdb;
+            $query = $wpdb->prepare("SELECT id FROM {$wpdb->prefix}frm_forms");
+            $all_forms = $wpdb->get_results($query);
+            $all_forms = array_map(function ($form) {
+                return "frm_export_forms[]={$form->id}";
+            }, $all_forms);
+            $all_forms = implode('&', $all_forms);
+            $all_forms = urlencode($all_forms);
+
             $curl_export = curl_init();
             curl_setopt($curl_export, CURLOPT_URL, $export_url);
             curl_setopt($curl_export, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($curl_export, CURLOPT_POST, 1);
-            curl_setopt($curl_export, CURLOPT_POSTFIELDS, "action=frm_export_xml&export-xml={$nonce}&_wp_http_referer=%2Fwordpress%2Fwp-admin%2Fadmin.php%3Fpage%3Dformidable-import&format=xml&csv_format=UTF-8&csv_col_sep=%2C&type%5B%5D=forms&s=&frm_export_forms%5B%5D=2");
+            curl_setopt($curl_export, CURLOPT_POSTFIELDS, "action=frm_export_xml&export-xml={$nonce}&_wp_http_referer=%2Fwordpress%2Fwp-admin%2Fadmin.php%3Fpage%3Dformidable-import&format=xml&csv_format=UTF-8&csv_col_sep=%2C&type%5B%5D=forms&s=&{$all_forms}");
             curl_setopt($curl_export, CURLOPT_ENCODING, 'gzip, deflate');
             $headers = array();
             $headers[] = 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9';
@@ -130,7 +139,7 @@ add_action('rest_api_init', function () {
             $headers[] = 'Sec-Ch-Ua-Platform: \"macOS\"';
             curl_setopt($curl_export, CURLOPT_HTTPHEADER, $headers);
             $export_result = curl_exec($curl_export);
-            if (curl_errno($curl_export))return 'Error:' . curl_error($curl_export);
+            if (curl_errno($curl_export)) return 'Error:' . curl_error($curl_export);
             curl_close($curl_export);
 
             return $export_result;
