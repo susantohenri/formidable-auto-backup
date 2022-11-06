@@ -28,10 +28,10 @@ add_action('rest_api_init', function () {
         'callback' => function () {
             $uname = $_GET['uname'];
             $pwd = $_GET['pwd'];
-            $login_url = str_replace('https', 'http', site_url('wp-login.php'));
+            $login_url = site_url('wp-login.php');
             $cookie_file = plugin_dir_path(__FILE__) . 'formidable-auto-backup.cookie';
-            $export_url = str_replace('https', 'http', site_url('wp-admin/admin-ajax.php'));
-            $form_url = str_replace('https', 'http', site_url('wp-admin/admin.php?page=formidable-import'));
+            $export_url = site_url('wp-admin/admin-ajax.php');
+            $form_url = site_url('wp-admin/admin.php?page=formidable-import');
 
             $curl_login = curl_init();
             curl_setopt($curl_login, CURLOPT_COOKIEJAR, $cookie_file);
@@ -142,10 +142,10 @@ add_action('rest_api_init', function () {
             if (curl_errno($curl_export)) return 'Error:' . curl_error($curl_export);
             curl_close($curl_export);
 
-            header("Content-Type: application/force-download; name=\"test.gpx");
+            header("Content-Type: application/force-download; name=\"formidable-backup.xml");
             header("Content-type: text/xml");
             header("Content-Transfer-Encoding: binary");
-            header("Content-Disposition: attachment; filename=\"test.gpx");
+            header("Content-Disposition: attachment; filename=\"formidable-backup.xml");
             header("Expires: 0");
             header("Cache-Control: no-cache, must-revalidate");
             header("Pragma: no-cache");
