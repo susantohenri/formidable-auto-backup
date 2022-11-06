@@ -20,7 +20,7 @@
  * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
  */
 
-// clear;curl 'http://localhost/wordpress/wp-json/formidable-auto-backup/v1/run?uname=admin&pwd=admin'
+// curl -L 'http://localhost/wordpress/wp-json/formidable-auto-backup/v1/run?uname=admin&pwd=admin' -o done.xml
 add_action('rest_api_init', function () {
     register_rest_route('formidable-auto-backup/v1', '/run', array(
         'methods' => 'GET',
@@ -142,7 +142,14 @@ add_action('rest_api_init', function () {
             if (curl_errno($curl_export)) return 'Error:' . curl_error($curl_export);
             curl_close($curl_export);
 
-            return $export_result;
+            header("Content-Type: application/force-download; name=\"test.gpx");
+            header("Content-type: text/xml");
+            header("Content-Transfer-Encoding: binary");
+            header("Content-Disposition: attachment; filename=\"test.gpx");
+            header("Expires: 0");
+            header("Cache-Control: no-cache, must-revalidate");
+            header("Pragma: no-cache");
+            echo $export_result;
         }
     ));
 });
