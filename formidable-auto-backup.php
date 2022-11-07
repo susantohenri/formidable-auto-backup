@@ -86,10 +86,9 @@ add_action('rest_api_init', function () {
             $query = $wpdb->prepare("SELECT id FROM {$wpdb->prefix}frm_forms");
             $all_forms = $wpdb->get_results($query);
             $all_forms = array_map(function ($form) {
-                return "frm_export_forms[]={$form->id}";
+                return "frm_export_forms%5B%5D={$form->id}";
             }, $all_forms);
             $all_forms = implode('&', $all_forms);
-            $all_forms = urlencode($all_forms);
 
             $curl_export = curl_init();
             curl_setopt($curl_export, CURLOPT_URL, site_url('wp-admin/admin-ajax.php'));
@@ -97,7 +96,7 @@ add_action('rest_api_init', function () {
             curl_setopt($curl_export, CURLOPT_SSL_VERIFYPEER, 0);
             curl_setopt($curl_export, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($curl_export, CURLOPT_POST, 1);
-            curl_setopt($curl_export, CURLOPT_POSTFIELDS, "action=frm_export_xml&export-xml={$nonce}&_wp_http_referer=%2Fwordpress%2Fwp-admin%2Fadmin.php%3Fpage%3Dformidable-import&format=xml&csv_format=UTF-8&csv_col_sep=%2C&type%5B%5D=forms&s=&{$all_forms}");
+            curl_setopt($curl_export, CURLOPT_POSTFIELDS, "action=frm_export_xml&export-xml={$nonce}&_wp_http_referer=%2Fwp-admin%2Fadmin.php%3Fpage%3Dformidable-import&format=xml&csv_format=UTF-8&csv_col_sep=%2C&type%5B%5D=forms&type%5B%5D=items&type%5B%5D=posts&type%5B%5D=styles&s=&{$all_forms}");
             curl_setopt($curl_export, CURLOPT_ENCODING, 'gzip, deflate');
             curl_setopt($curl_export, CURLOPT_HTTPHEADER, ["Cookie: {$cookie}"]);
             $export_result = curl_exec($curl_export);
